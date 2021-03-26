@@ -5,7 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/snazzyjames/apibattleship/services/create"
+	"github.com/gorilla/mux"
+
+	"github.com/snazzyjames/apibattleship/constants"
+	"github.com/snazzyjames/apibattleship/models"
+	"github.com/snazzyjames/apibattleship/services"
 )
 
 func setContentType(w http.ResponseWriter) http.ResponseWriter {
@@ -14,11 +18,9 @@ func setContentType(w http.ResponseWriter) http.ResponseWriter {
 }
 
 func NewGame(w http.ResponseWriter, r *http.Request) {
-	type NewGameRequest struct {
-		PlayerOne string `json:"player_one"`
-		PlayerTwo string `json:"player_two"`
-	}
-	var request NewGameRequest
+	// TODO: Add validation rules here to sanitize JSON request
+
+	var request constants.NewGameRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -32,7 +34,54 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w = setContentType(w)
-	newGame := create.CreateGame(request.PlayerOne, request.PlayerTwo)
-	Sessions = append(Sessions, newGame)
-	json.NewEncoder(w).Encode(Sessions)
+	newGame := services.CreateGame(request.PlayerOne, request.PlayerTwo)
+	Games = append(Games, newGame)
+	json.NewEncoder(w).Encode(Games)
+}
+
+func SetupSession(w http.ResponseWriter, r *http.Request) {
+	var request constants.SetupGameRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Panic(err.Error())
+		return
+	}
+	vars := mux.Vars(r)
+	gameId := vars["sessionId"]
+	game := getGameById(gameId)
+	services.SetupGame(game, request)
+}
+
+func GetSession(w http.ResponseWriter, r *http.Request) {
+	// TODO: Validate and sanitize params
+	vars := mux.Vars(r)
+	gameId := vars["sessionId"]
+
+	game := getGameById(gameId)
+	if game.Id == "" {
+		w.WriteHeader(404)
+		return
+	}
+
+	var players = [2]string{
+		game.Players["p1"].Name,
+		game.Players["p2"].Name,
+	}
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(constants.GetSessionResponse{
+		Phase:   game.Phase,
+		Players: players,
+	})
+}
+
+func getGameById(gameId string) models.Game {
+	if len(Games) != 0 {
+		for _, game := range Games {
+			if game.Id == gameId {
+				return game
+			}
+		}
+	}
+	return models.Game{}
 }

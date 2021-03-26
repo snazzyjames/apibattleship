@@ -9,9 +9,10 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/snazzyjames/apibattleship/models"
+	"github.com/snazzyjames/apibattleship/services"
 )
 
-var Sessions []models.Game
+var Games []models.Game
 
 func main() {
 	router := Router()
@@ -22,6 +23,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
+
+	// Test game
+	newGame := services.CreateGame("james", "bri")
+	newGame.Id = "test"
+	Games = append(Games, newGame)
 
 	// http.ListenAndServe opens the server port, and blocks forever waiting for clients.
 	// If it fails to open the port, the log.Fatal call will report the problem and exit the program.

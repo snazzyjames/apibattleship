@@ -20,6 +20,18 @@ var routes = Routes{
 		"/games/new",
 		NewGame,
 	},
+	Route{
+		"SetupSession",
+		"POST",
+		"/games/{sessionId}/setup",
+		SetupSession,
+	},
+	Route{
+		"GetSession",
+		"GET",
+		"/games/{sessionId}",
+		GetSession,
+	},
 
 	//TODO: Get Game endpoint
 }
