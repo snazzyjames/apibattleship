@@ -9,7 +9,7 @@ import (
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-func CreateGame(p1 string, p2 string) (models.Game, error) {
+func CreateGame(p1 string, p2 string) models.Game {
 	var game models.Game
 
 	id, err := gonanoid.New(5)
@@ -22,13 +22,13 @@ func CreateGame(p1 string, p2 string) (models.Game, error) {
 		Id:    1,
 		Name:  p1,
 		Ships: CreateFleet(),
-		Board: nil,
+		Board: CreateBoard(),
 	}
 	player2 := models.Player{
 		Id:    2,
 		Name:  p2,
-		Ships: nil,
-		Board: nil,
+		Ships: CreateFleet(),
+		Board: CreateBoard(),
 	}
 	game.Players = append(game.Players, player1, player2)
 
@@ -41,5 +41,5 @@ func CreateGame(p1 string, p2 string) (models.Game, error) {
 
 	game.Phase = "setup"
 
-	return game, err
+	return game
 }
