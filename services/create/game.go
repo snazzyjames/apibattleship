@@ -30,13 +30,16 @@ func CreateGame(p1 string, p2 string) models.Game {
 		Ships: CreateFleet(),
 		Board: CreateBoard(),
 	}
-	game.Players = append(game.Players, player1, player2)
+	players := make(map[string]models.Player)
+	players["p1"] = player1
+	players["p2"] = player2
+	game.Players = players
 
 	coinFlip := rand.Intn(2) == 0
 	if coinFlip == true {
-		game.PlayerTurn = 1
+		game.PlayerTurn = "p1"
 	} else {
-		game.PlayerTurn = 2
+		game.PlayerTurn = "p2"
 	}
 
 	game.Phase = "setup"

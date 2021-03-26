@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/snazzyjames/apibattleship/services/create"
@@ -22,6 +23,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Panic(err.Error())
 		return
 	} else if request.PlayerOne == "" || request.PlayerTwo == "" {
 		message := "Two players required"
