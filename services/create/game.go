@@ -32,8 +32,8 @@ func CreateGame(p1 string, p2 string) models.Game {
 	}
 	game.Players = append(game.Players, player1, player2)
 
-	coinflip := rand.Float32() < 0.5
-	if coinflip == true {
+	coinFlip := rand.Intn(2) == 0
+	if coinFlip == true {
 		game.PlayerTurn = 1
 	} else {
 		game.PlayerTurn = 2

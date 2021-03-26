@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/snazzyjames/apibattleship/services/create"
 )
@@ -31,7 +29,6 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rand.Seed(time.Now().UnixNano())
 	w = setContentType(w)
 	newGame := create.CreateGame(request.PlayerOne, request.PlayerTwo)
 	Sessions = append(Sessions, newGame)
