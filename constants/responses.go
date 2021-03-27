@@ -10,3 +10,8 @@ type SetupGameResponse struct {
 	NextPlayer string `json:"next_player"`
 	Phase      string `json:"phase"`
 }
+
+type PlayGameResponse struct {
+	Result     string `json:"result"`
+	NextPlayer string `json:"next_player"`
+}

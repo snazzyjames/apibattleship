@@ -24,9 +24,9 @@ func PrintBoard(b models.Board) (str string) {
 				str += "S "
 			case b[x][y] == constants.ShipDestroyer:
 				str += "D "
-			case b[x][y]&constants.PlayerHit > 0:
+			case b[x][y]&constants.Hit > 0:
 				str += "X "
-			case b[x][y]&constants.PlayerShot > 0:
+			case b[x][y]&constants.Shot > 0:
 				str += "O "
 			default:
 				str += "- "

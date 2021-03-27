@@ -27,6 +27,12 @@ var routes = Routes{
 		SetupSession,
 	},
 	Route{
+		"PlaySession",
+		"POST",
+		"/games/{sessionId}/play",
+		PlaySession,
+	},
+	Route{
 		"GetSession",
 		"GET",
 		"/games/{sessionId}",

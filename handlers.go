@@ -18,6 +18,7 @@ func setContentType(w http.ResponseWriter) http.ResponseWriter {
 }
 
 func NewGame(w http.ResponseWriter, r *http.Request) {
+	w = setContentType(w)
 	// TODO: Add validation rules here to sanitize JSON request
 
 	var request constants.NewGameRequest
@@ -51,6 +52,10 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
+	if game.Id == "" {
+		w.WriteHeader(404)
+		return
+	}
 	response, err := services.SetupGame(game, request)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -61,7 +66,32 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func PlaySession(w http.ResponseWriter, r *http.Request) {
+	w = setContentType(w)
+	var request constants.PlayGameRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Panic(err.Error())
+		return
+	}
+	// TODO: Validate and sanitize params
+	vars := mux.Vars(r)
+	gameId := vars["sessionId"]
+	game := getGameById(gameId)
+	if game.Id == "" {
+		w.WriteHeader(404)
+		return
+	}
+	result, nextPlayer, err := services.PlayGame(game, request.Coordinate, request.Player)
+	json.NewEncoder(w).Encode(constants.PlayGameResponse{
+		Result:     result,
+		NextPlayer: nextPlayer,
+	})
+}
+
 func GetSession(w http.ResponseWriter, r *http.Request) {
+	w = setContentType(w)
 	// TODO: Validate and sanitize params
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]

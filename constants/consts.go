@@ -1,9 +1,8 @@
 package constants
 
 const (
-	PlayerShot  = 1 << iota // 00000001
-	PlayerHit               // 00000010
-	OpponentHit             // 00000100
+	Shot = 1 << iota // 00000001
+	Hit              // 00000010
 
 	// The first 3 bits represent the type of ship, so the ship mask
 	// is what we can use to identify bytes that are a ship
@@ -14,5 +13,4 @@ const (
 	ShipCruiser    = 3 << 5
 	ShipSubmarine  = 4 << 5
 	ShipDestroyer  = 5 << 5
-	Empty          = 0 << 5
 )

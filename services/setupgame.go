@@ -11,6 +11,7 @@ import (
 	"github.com/snazzyjames/apibattleship/services/util"
 )
 
+//TODO: Refactor so we pass in what we want from the handler and return what we want the response to be
 func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants.SetupGameResponse, error) {
 	if game.PlayerTurn != request.Player {
 		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)

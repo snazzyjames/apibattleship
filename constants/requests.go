@@ -11,3 +11,8 @@ type SetupGameRequest struct {
 	Direction  string `json:"direction"`
 	Player     string `json:"player"`
 }
+
+type PlayGameRequest struct {
+	Coordinate string `json:"coordinate"`
+	Player     string `json:"player"`
+}
