@@ -2,16 +2,15 @@ package services
 
 import (
 	"log"
-	"math/rand"
 
 	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
-	"github.com/snazzyjames/apibattleship/services/util"
+	"github.com/snazzyjames/apibattleship/util"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-func CreateGame(p1 string, p2 string) *models.Game {
+func CreateGame(p1 string, p2 string) (*models.Game, constants.NewGameResponse, error) {
 	var game models.Game
 
 	id, err := gonanoid.New(5)
@@ -36,17 +35,16 @@ func CreateGame(p1 string, p2 string) *models.Game {
 	players["p1"] = player1
 	players["p2"] = player2
 	game.Players = players
-
-	coinFlip := rand.Intn(2) == 0
-	if coinFlip == true {
-		game.PlayerTurn = player1.Name
-	} else {
-		game.PlayerTurn = player2.Name
-	}
-
+	game.PlayerTurn = player1.Name
 	game.Phase = "setup"
 
-	return &game
+	util.PrintStats(&game)
+
+	return &game, constants.NewGameResponse{
+		SessionId: game.Id,
+		Phase:     game.Phase,
+		Player:    game.PlayerTurn,
+	}, nil
 }
 
 func createBoard() models.Board {
@@ -56,12 +54,12 @@ func createBoard() models.Board {
 	for row := range Board {
 		Board[row] = make([]byte, boardSizeY)
 	}
-	log.Print(util.PrintBoard(Board))
 	return Board
 }
 
 func createFleet() models.Ships {
-	// We make a map of pointers to ship addresses so that we can check/update ships via pointer
+	// We make a map of pointers (models.Ships)
+	// to ship addresses so that we can check/update ships
 	fleet := make(models.Ships)
 
 	fleet["carrier"] = &models.Ship{

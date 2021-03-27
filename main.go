@@ -10,7 +10,6 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/snazzyjames/apibattleship/models"
-	"github.com/snazzyjames/apibattleship/services"
 )
 
 var Games models.Games
@@ -24,12 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-
-	// Test game
-	newGame := services.CreateGame("james", "bri")
-	newGame.Id = "test"
-	newGame.PlayerTurn = "bri"
-	Games = append(Games, newGame)
 
 	log.Printf("Listening on port %s", os.Getenv("APP_PORT"))
 

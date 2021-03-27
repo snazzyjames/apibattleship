@@ -19,25 +19,26 @@ func setContentType(w http.ResponseWriter) http.ResponseWriter {
 
 func NewGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
-	// TODO: Add validation rules here to sanitize JSON request
-
 	var request constants.NewGameRequest
-
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		log.Panic(err.Error())
 		return
-	} else if request.PlayerOne == "" || request.PlayerTwo == "" {
+	}
+	if request.PlayerOne == "" || request.PlayerTwo == "" {
 		message := "Two players required"
 		http.Error(w, message, http.StatusBadRequest)
 		return
 	}
 
-	w = setContentType(w)
-	newGame := services.CreateGame(request.PlayerOne, request.PlayerTwo)
+	newGame, response, err := services.CreateGame(request.PlayerOne, request.PlayerTwo)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	Games = append(Games, newGame)
-	json.NewEncoder(w).Encode(Games)
+	json.NewEncoder(w).Encode(response)
 }
 
 func SetupSession(w http.ResponseWriter, r *http.Request) {
@@ -49,18 +50,22 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err.Error())
 		return
 	}
+	if request.Player == "" || request.Coordinate == "" || request.Direction == "" || request.Ship == "" {
+		http.Error(w, "unrecognized json", http.StatusBadRequest)
+		return
+	}
+
 	vars := mux.Vars(r)
+	// TODO: Validate and sanitize params
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
-	if game.Id == "" {
+	if game == nil {
 		w.WriteHeader(404)
 		return
 	}
 	response, err := services.SetupGame(game, request)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(response)
-		return
 	}
 	json.NewEncoder(w).Encode(response)
 	return
@@ -72,22 +77,30 @@ func PlaySession(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		log.Panic(err.Error())
+		return
+	}
+	if request.Player == "" || request.Coordinate == "" {
+		http.Error(w, "unrecognized json", http.StatusBadRequest)
 		return
 	}
 	// TODO: Validate and sanitize params
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
-	if game.Id == "" {
+
+	if game == nil {
 		w.WriteHeader(404)
 		return
 	}
-	result, nextPlayer, err := services.PlayGame(game, request.Coordinate, request.Player)
-	json.NewEncoder(w).Encode(constants.PlayGameResponse{
-		Result:     result,
-		NextPlayer: nextPlayer,
-	})
+	if game.Phase == "setup" || game.Phase == "game_over" {
+		http.Error(w, "game is not in play phase", http.StatusBadRequest)
+		return
+	}
+	response, err := services.PlayGame(game, request)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetSession(w http.ResponseWriter, r *http.Request) {
@@ -97,8 +110,8 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	gameId := vars["sessionId"]
 
 	game := getGameById(gameId)
-	if game.Id == "" {
-		w.WriteHeader(404)
+	if game == nil {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
@@ -106,7 +119,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 		game.Players["p1"].Name,
 		game.Players["p2"].Name,
 	}
-	w.WriteHeader(200)
+
 	json.NewEncoder(w).Encode(constants.GetSessionResponse{
 		Phase:   game.Phase,
 		Players: players,

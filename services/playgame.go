@@ -1,24 +1,35 @@
 package services
 
 import (
-	"errors"
+	"fmt"
 	"log"
 
 	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
-	"github.com/snazzyjames/apibattleship/services/util"
+	"github.com/snazzyjames/apibattleship/util"
 )
 
-func PlayGame(game *models.Game, coordinate string, player string) (result string, nextPlayer string, err error) {
-	if game.PlayerTurn != player {
-		log.Printf("error: Not %s's turn. Player turn is %s", player, game.PlayerTurn)
-		return "not_your_turn", game.PlayerTurn, errors.New("Invalid player turn")
+func PlayGame(game *models.Game, request constants.PlayGameRequest) (constants.PlayGameResponse, error) {
+	if game.PlayerTurn != request.Player {
+		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
+		return constants.PlayGameResponse{
+			Result:     "not_your_turn",
+			NextPlayer: game.PlayerTurn,
+		}, fmt.Errorf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
+	}
+
+	if game.Phase != "setup" {
+		log.Printf("cannot setup game, game phase is %v", game.Phase)
+		return constants.PlayGameResponse{
+			Result:     "",
+			NextPlayer: game.PlayerTurn,
+		}, fmt.Errorf("cannot setup game, game phase is %v", game.Phase)
 	}
 
 	players := game.Players
 	var board models.Board
 	var ships map[string]*models.Ship
-	if (players)["p1"].Name == player {
+	if (players)["p1"].Name == request.Player {
 		board = (players)["p2"].Board
 		ships = (players)["p2"].Ships
 	} else {
@@ -26,34 +37,32 @@ func PlayGame(game *models.Game, coordinate string, player string) (result strin
 		ships = (players)["p1"].Ships
 	}
 
-	x, y, err := util.ParsePosition(coordinate)
+	x, y, err := util.ParsePosition(request.Coordinate)
 	if err != nil {
 		log.Println(err)
 	}
 
-	result = fire(&board, ships, x, y)
+	result := fire(&board, ships, x, y)
 
-	// Debug logic for outputting result of shots
-	log.Println("Player 1 Board/Ship Status")
-	for _, p1ship := range players["p1"].Ships {
-		log.Printf("Name: %v HP: %v/%v", p1ship.Name, p1ship.HitPoints, p1ship.Length)
-	}
-	log.Println(util.PrintBoard(players["p1"].Board))
-
-	log.Println("Player 2 Board/Ship Status")
-	for _, p2ship := range players["p2"].Ships {
-		log.Printf("Name: %v HP: %v/%v", p2ship.Name, p2ship.HitPoints, p2ship.Length)
-	}
-	log.Println(util.PrintBoard(players["p2"].Board))
-
-	// End Debug logic
+	// Print stats is used for debugging.  It will print the game players' ship statuses and boards
+	util.PrintStats(game)
 
 	allSunk := checkIfAllShipsSunk(ships)
 	if allSunk {
+		game.Phase = "game_over"
 		result = "hit_good_game"
 	}
 
-	return result, "james", nil
+	if game.PlayerTurn == game.Players["p1"].Name {
+		game.PlayerTurn = game.Players["p2"].Name
+	} else {
+		game.PlayerTurn = game.Players["p1"].Name
+	}
+
+	return constants.PlayGameResponse{
+		Result:     result,
+		NextPlayer: game.PlayerTurn,
+	}, nil
 }
 
 func checkIfAllShipsSunk(ships models.Ships) bool {

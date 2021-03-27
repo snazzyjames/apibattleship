@@ -8,10 +8,9 @@ import (
 
 	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
-	"github.com/snazzyjames/apibattleship/services/util"
+	"github.com/snazzyjames/apibattleship/util"
 )
 
-//TODO: Refactor so we pass in what we want from the handler and return what we want the response to be
 func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants.SetupGameResponse, error) {
 	if game.PlayerTurn != request.Player {
 		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
@@ -19,7 +18,16 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants
 			Placed:     "false",
 			NextPlayer: game.PlayerTurn,
 			Phase:      game.Phase,
-		}, fmt.Errorf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
+		}, errors.New("incorrect player turn")
+	}
+
+	if game.Phase != "setup" {
+		log.Printf("cannot setup game, game phase is %v", game.Phase)
+		return constants.SetupGameResponse{
+			Placed:     "false",
+			NextPlayer: game.PlayerTurn,
+			Phase:      game.Phase,
+		}, fmt.Errorf("cannot setup game, game phase is %v", game.Phase)
 	}
 
 	players := game.Players
@@ -37,6 +45,11 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants
 	x, y, err := util.ParsePosition(request.Coordinate)
 	if err != nil {
 		log.Println(err)
+		return constants.SetupGameResponse{
+			Placed:     "false",
+			NextPlayer: game.PlayerTurn,
+			Phase:      game.Phase,
+		}, errors.New("failed parsing position")
 	}
 
 	var ship *models.Ship
@@ -50,7 +63,13 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants
 	placed, err := placeShip(&board, x, y, ship, request.Direction)
 	if err != nil {
 		log.Println(err)
+		return constants.SetupGameResponse{
+			Placed:     "false",
+			NextPlayer: game.PlayerTurn,
+			Phase:      game.Phase,
+		}, err
 	}
+
 	if placed {
 		if game.PlayerTurn == game.Players["p1"].Name {
 			game.PlayerTurn = game.Players["p2"].Name
@@ -64,8 +83,7 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants
 		game.Phase = "play"
 	}
 
-	log.Println(util.PrintBoard(players["p1"].Board))
-	log.Println(util.PrintBoard(players["p2"].Board))
+	util.PrintStats(game)
 
 	return constants.SetupGameResponse{
 		Placed:     strconv.FormatBool(placed),

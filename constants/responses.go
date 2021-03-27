@@ -1,5 +1,11 @@
 package constants
 
+type NewGameResponse struct {
+	SessionId string `json:"session_id"`
+	Phase     string `json:"phase"`
+	Player    string `json:"player"`
+}
+
 type GetSessionResponse struct {
 	Phase   string    `json:"phase"`
 	Players [2]string `json:"players"`
