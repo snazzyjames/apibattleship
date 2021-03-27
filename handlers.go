@@ -40,6 +40,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupSession(w http.ResponseWriter, r *http.Request) {
+	w = setContentType(w)
 	var request constants.SetupGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -50,8 +51,14 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
-	response := services.SetupGame(game, request)
+	response, err := services.SetupGame(game, request)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(response)
+		return
+	}
 	json.NewEncoder(w).Encode(response)
+	return
 }
 
 func GetSession(w http.ResponseWriter, r *http.Request) {

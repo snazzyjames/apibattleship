@@ -11,14 +11,14 @@ import (
 	"github.com/snazzyjames/apibattleship/services/util"
 )
 
-func SetupGame(game *models.Game, request constants.SetupGameRequest) constants.SetupGameResponse {
+func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants.SetupGameResponse, error) {
 	if game.PlayerTurn != request.Player {
 		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
 		return constants.SetupGameResponse{
 			Placed:     "false",
 			NextPlayer: game.PlayerTurn,
 			Phase:      game.Phase,
-		}
+		}, fmt.Errorf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
 	}
 
 	players := game.Players
@@ -70,7 +70,7 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) constants.
 		Placed:     strconv.FormatBool(placed),
 		NextPlayer: game.PlayerTurn,
 		Phase:      game.Phase,
-	}
+	}, nil
 }
 
 func checkIfAllShipsPlaced(ships1 models.Ships, ships2 models.Ships) bool {
@@ -93,6 +93,10 @@ func placeShip(board *models.Board, x int, y int, ship *models.Ship, direction s
 		return false, errors.New("error: ship already placed")
 	}
 	var mx, my int
+
+	if direction != "right" && direction != "down" {
+		return false, errors.New("error: invalid direction")
+	}
 	switch direction {
 	case "right":
 		mx = 1

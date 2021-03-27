@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -30,7 +31,9 @@ func main() {
 	newGame.PlayerTurn = "bri"
 	Games = append(Games, newGame)
 
+	log.Printf("Listening on port %s", os.Getenv("APP_PORT"))
+
 	// http.ListenAndServe opens the server port, and blocks forever waiting for clients.
 	// If it fails to open the port, the log.Fatal call will report the problem and exit the program.
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(os.Getenv("APP_PORT"), router))
 }
