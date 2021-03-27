@@ -6,3 +6,5 @@ type Game struct {
 	PlayerTurn string            `json:"playerturn"`
 	Phase      string            `json:"phase"`
 }
+
+type Games []*Game

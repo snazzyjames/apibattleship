@@ -50,7 +50,8 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
-	services.SetupGame(game, request)
+	response := services.SetupGame(game, request)
+	json.NewEncoder(w).Encode(response)
 }
 
 func GetSession(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +76,7 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func getGameById(gameId string) models.Game {
+func getGameById(gameId string) *models.Game {
 	if len(Games) != 0 {
 		for _, game := range Games {
 			if game.Id == gameId {
@@ -83,5 +84,5 @@ func getGameById(gameId string) models.Game {
 			}
 		}
 	}
-	return models.Game{}
+	return nil
 }

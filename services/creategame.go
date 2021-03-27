@@ -4,13 +4,14 @@ import (
 	"log"
 	"math/rand"
 
+	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
 	"github.com/snazzyjames/apibattleship/services/util"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-func CreateGame(p1 string, p2 string) models.Game {
+func CreateGame(p1 string, p2 string) *models.Game {
 	var game models.Game
 
 	id, err := gonanoid.New(5)
@@ -45,7 +46,7 @@ func CreateGame(p1 string, p2 string) models.Game {
 
 	game.Phase = "setup"
 
-	return game
+	return &game
 }
 
 func createBoard() models.Board {
@@ -55,37 +56,48 @@ func createBoard() models.Board {
 	for row := range Board {
 		Board[row] = make([]byte, boardSizeY)
 	}
-	log.Print(util.Print(Board))
+	log.Print(util.PrintBoard(Board))
 	return Board
 }
 
-func createFleet() map[string]models.Ship {
-	fleet := make(map[string]models.Ship)
+func createFleet() models.Ships {
+	// We make a map of pointers to ship addresses so that we can check/update ships via pointer
+	fleet := make(models.Ships)
 
-	fleet["carrier"] = models.Ship{
+	fleet["carrier"] = &models.Ship{
 		Name:      "carrier",
-		Mask:      1 << 5,
+		Mask:      constants.ShipCarrier,
 		HitPoints: 5,
+		Length:    5,
+		Placed:    false,
 	}
-	fleet["battleship"] = models.Ship{
+	fleet["battleship"] = &models.Ship{
 		Name:      "battleship",
-		Mask:      2 << 5,
+		Mask:      constants.ShipBattleship,
 		HitPoints: 4,
+		Length:    4,
+		Placed:    false,
 	}
-	fleet["cruiser"] = models.Ship{
+	fleet["cruiser"] = &models.Ship{
 		Name:      "cruiser",
-		Mask:      3 << 5,
+		Mask:      constants.ShipCruiser,
 		HitPoints: 3,
+		Length:    3,
+		Placed:    false,
 	}
-	fleet["submarine"] = models.Ship{
+	fleet["submarine"] = &models.Ship{
 		Name:      "submarine",
-		Mask:      4 << 5,
+		Mask:      constants.ShipSubmarine,
 		HitPoints: 3,
+		Length:    3,
+		Placed:    false,
 	}
-	fleet["destroyer"] = models.Ship{
+	fleet["destroyer"] = &models.Ship{
 		Name:      "destroyer",
-		Mask:      5 << 5,
+		Mask:      constants.ShipDestroyer,
 		HitPoints: 2,
+		Length:    2,
+		Placed:    false,
 	}
 
 	return fleet

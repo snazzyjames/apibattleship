@@ -11,7 +11,8 @@ const (
 	ShipMask       = (1<<8 - 1) &^ (1<<5 - 1) // 11100000
 	ShipCarrier    = 1 << 5
 	ShipBattleship = 2 << 5
-	ShipDestroyer  = 3 << 5
+	ShipCruiser    = 3 << 5
 	ShipSubmarine  = 4 << 5
-	ShipPatrolBoat = 5 << 5
+	ShipDestroyer  = 5 << 5
+	Empty          = 0 << 5
 )

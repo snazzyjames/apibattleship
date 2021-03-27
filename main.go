@@ -12,7 +12,7 @@ import (
 	"github.com/snazzyjames/apibattleship/services"
 )
 
-var Games []models.Game
+var Games models.Games
 
 func main() {
 	router := Router()
@@ -27,6 +27,7 @@ func main() {
 	// Test game
 	newGame := services.CreateGame("james", "bri")
 	newGame.Id = "test"
+	newGame.PlayerTurn = "bri"
 	Games = append(Games, newGame)
 
 	// http.ListenAndServe opens the server port, and blocks forever waiting for clients.
