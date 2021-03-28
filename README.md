@@ -4,7 +4,7 @@ API Battleship is a REST API for playing the popular Milton Bradley game Battles
 
 ## How to Run the Application
 
-This project was built in Golang, so running the `apibattleship` executable should be enough to start the application:
+This project was built in Golang, so running the `apibattleship` executable from a command line should be enough to start the application:
 
 ```bash
 ./apibattleship
