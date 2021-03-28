@@ -1,10 +1,10 @@
 # API Battleship
 
-API Battleship is a REST API for playing the popular Milton Bradley game Battleship
+API Battleship is a REST API for playing the popular Milton Bradley game Battleship.
 
 ## How to Run the Application
 
-This project was built in Golang, so running the `apibattleship` executable from a command line should be enough to start the application:
+Run `go build` from the project directory, which will generate an executable called `apibattleship`, which you can then run.
 
 ```bash
 ./apibattleship
