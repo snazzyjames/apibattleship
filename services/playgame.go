@@ -7,17 +7,19 @@ import (
 
 	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
+	"github.com/snazzyjames/apibattleship/requests"
+	"github.com/snazzyjames/apibattleship/responses"
 	"github.com/snazzyjames/apibattleship/util"
 )
 
-func PlayGame(game *models.Game, request constants.PlayGameRequest) (constants.PlayGameResponse, error) {
+func PlayGame(game *models.Game, request requests.PlayGameRequest) (responses.PlayGameResponse, error) {
 	if game.Phase != "play" {
 		result := "not_your_turn"
 		if game.Phase == "game_over" {
 			result = "game_over"
 		}
 		log.Printf("cannot play game, game phase is %v", game.Phase)
-		return constants.PlayGameResponse{
+		return responses.PlayGameResponse{
 			Result:     result,
 			NextPlayer: game.Players[game.PlayerTurn].Name,
 		}, fmt.Errorf("cannot play game, game phase is %v", game.Phase)
@@ -25,7 +27,7 @@ func PlayGame(game *models.Game, request constants.PlayGameRequest) (constants.P
 
 	if game.Players[game.PlayerTurn].Name != request.Player {
 		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
-		return constants.PlayGameResponse{
+		return responses.PlayGameResponse{
 			Result:     "not_your_turn",
 			NextPlayer: game.PlayerTurn,
 		}, fmt.Errorf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
@@ -40,7 +42,7 @@ func PlayGame(game *models.Game, request constants.PlayGameRequest) (constants.P
 		// If the position is invalid we return a result of miss with an error code of 500,
 		// may want to add to the contract for when errors like this happen
 		log.Println(err)
-		return constants.PlayGameResponse{
+		return responses.PlayGameResponse{
 			Result:     "miss",
 			NextPlayer: game.Players[game.PlayerTurn].Name,
 		}, errors.New("failed parsing position")
@@ -63,7 +65,7 @@ func PlayGame(game *models.Game, request constants.PlayGameRequest) (constants.P
 		result = "hit_good_game"
 	}
 
-	return constants.PlayGameResponse{
+	return responses.PlayGameResponse{
 		Result:     result,
 		NextPlayer: game.Players[game.PlayerTurn].Name,
 	}, nil

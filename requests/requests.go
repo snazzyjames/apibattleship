@@ -1,4 +1,4 @@
-package constants
+package requests
 
 type NewGameRequest struct {
 	PlayerOne string `json:"player_one"`

@@ -15,7 +15,7 @@ type Routes []Route
 
 var routes = Routes{
 
-	//	New Game
+	//	New Game (/games/new)
 	//	Method: POST
 	//	Request:
 	//		JSON {"player_one": "<name>", "player_two": "<other name>"}
@@ -27,7 +27,7 @@ var routes = Routes{
 		"/games/new",
 		NewGame,
 	},
-	//	Setup Game
+	//	Setup Game (/games/<session_id>/setup)
 	//	Method: POST
 	//	Path param: sessionId (the ID of the game to setup)
 	//	Request:
@@ -42,7 +42,7 @@ var routes = Routes{
 		"/games/{sessionId}/setup",
 		SetupGame,
 	},
-	//	Play Game
+	//	Play Game (/games/<session_id/play)
 	//	Method: POST
 	//	Path Param: sessionId (the ID of the game to play)
 	//	Request:
@@ -56,7 +56,7 @@ var routes = Routes{
 		"/games/{sessionId}/play",
 		PlayGame,
 	},
-	// Get Game
+	// Get Game (/games/<session_id>)
 	// Method: GET
 	// Path Param: sessionId (the ID of the game to get)
 	// Response:

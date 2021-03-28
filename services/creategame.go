@@ -5,12 +5,13 @@ import (
 
 	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
+	"github.com/snazzyjames/apibattleship/responses"
 	"github.com/snazzyjames/apibattleship/util"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
 
-func CreateGame(p1 string, p2 string) (*models.Game, constants.NewGameResponse, error) {
+func CreateGame(p1 string, p2 string) (*models.Game, responses.NewGameResponse, error) {
 	var game models.Game
 
 	id, err := gonanoid.New(5)
@@ -41,7 +42,7 @@ func CreateGame(p1 string, p2 string) (*models.Game, constants.NewGameResponse, 
 
 	util.PrintStats(&game)
 
-	return &game, constants.NewGameResponse{
+	return &game, responses.NewGameResponse{
 		SessionId: game.Id,
 		Phase:     game.Phase,
 		Player:    game.Players[game.PlayerTurn].Name,

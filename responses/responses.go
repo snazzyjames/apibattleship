@@ -1,4 +1,4 @@
-package constants
+package responses
 
 type NewGameResponse struct {
 	SessionId string `json:"session_id"`

@@ -7,8 +7,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/snazzyjames/apibattleship/constants"
 	"github.com/snazzyjames/apibattleship/models"
+	"github.com/snazzyjames/apibattleship/requests"
+	"github.com/snazzyjames/apibattleship/responses"
 	"github.com/snazzyjames/apibattleship/services"
 )
 
@@ -18,7 +19,7 @@ and write responses
 */
 func NewGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
-	var request constants.NewGameRequest
+	var request requests.NewGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -42,7 +43,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 
 func SetupGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
-	var request constants.SetupGameRequest
+	var request requests.SetupGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -71,7 +72,7 @@ func SetupGame(w http.ResponseWriter, r *http.Request) {
 
 func PlayGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
-	var request constants.PlayGameRequest
+	var request requests.PlayGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -115,7 +116,7 @@ func GetGame(w http.ResponseWriter, r *http.Request) {
 		game.Players["p2"].Name,
 	}
 
-	json.NewEncoder(w).Encode(constants.GetSessionResponse{
+	json.NewEncoder(w).Encode(responses.GetSessionResponse{
 		Phase:   game.Phase,
 		Players: players,
 	})
