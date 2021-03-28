@@ -142,6 +142,6 @@ func placeShip(board *models.Board, x int, y int, ship *models.Ship, direction s
 		y += modifyY
 	}
 
-	(*ship).Placed = true
+	ship.Placed = true
 	return true, nil
 }
