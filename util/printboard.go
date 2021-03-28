@@ -19,7 +19,7 @@ func PrintBoard(b models.Board) (str string) {
 			case b[x][y] == constants.ShipBattleship:
 				str += "B "
 			case b[x][y] == constants.ShipCruiser:
-				str += "K "
+				str += "Z "
 			case b[x][y] == constants.ShipSubmarine:
 				str += "S "
 			case b[x][y] == constants.ShipDestroyer:

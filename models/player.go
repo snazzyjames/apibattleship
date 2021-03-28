@@ -1,8 +1,8 @@
 package models
 
 type Player struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Ships Ships  `json:"ships"`
-	Board Board  `json:"board"`
+	Id    int
+	Name  string
+	Ships Ships
+	Board Board
 }

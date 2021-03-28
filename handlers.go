@@ -12,11 +12,10 @@ import (
 	"github.com/snazzyjames/apibattleship/services"
 )
 
-func setContentType(w http.ResponseWriter) http.ResponseWriter {
-	w.Header().Set("Content-Type", "application/json")
-	return w
-}
-
+/*
+Handlers (i.e. Controllers) to check and marshall incoming requests, set content type, call service functions,
+and write responses
+*/
 func NewGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
 	var request constants.NewGameRequest
@@ -31,7 +30,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, message, http.StatusBadRequest)
 		return
 	}
-
+	// TODO: validate and sanitize input params using Golang best practices
 	newGame, response, err := services.CreateGame(request.PlayerOne, request.PlayerTwo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -41,7 +40,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func SetupSession(w http.ResponseWriter, r *http.Request) {
+func SetupGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
 	var request constants.SetupGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -54,9 +53,8 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unrecognized json", http.StatusBadRequest)
 		return
 	}
-
+	// TODO: validate and sanitize input params using Golang best practices
 	vars := mux.Vars(r)
-	// TODO: Validate and sanitize params
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
 	if game == nil {
@@ -71,7 +69,7 @@ func SetupSession(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func PlaySession(w http.ResponseWriter, r *http.Request) {
+func PlayGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
 	var request constants.PlayGameRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -83,17 +81,13 @@ func PlaySession(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unrecognized json", http.StatusBadRequest)
 		return
 	}
-	// TODO: Validate and sanitize params
+	// TODO: validate and sanitize input params using Golang best practices
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
 
 	if game == nil {
 		w.WriteHeader(404)
-		return
-	}
-	if game.Phase == "setup" || game.Phase == "game_over" {
-		http.Error(w, "game is not in play phase", http.StatusBadRequest)
 		return
 	}
 	response, err := services.PlayGame(game, request)
@@ -103,9 +97,10 @@ func PlaySession(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func GetSession(w http.ResponseWriter, r *http.Request) {
+func GetGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
-	// TODO: Validate and sanitize params
+
+	// TODO: future improvement: validate and sanitize input params using Golang best practices
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 
@@ -124,6 +119,11 @@ func GetSession(w http.ResponseWriter, r *http.Request) {
 		Phase:   game.Phase,
 		Players: players,
 	})
+}
+
+func setContentType(w http.ResponseWriter) http.ResponseWriter {
+	w.Header().Set("Content-Type", "application/json")
+	return w
 }
 
 func getGameById(gameId string) *models.Game {

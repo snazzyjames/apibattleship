@@ -13,7 +13,7 @@ type GetSessionResponse struct {
 
 type SetupGameResponse struct {
 	Placed     string `json:"placed"`
-	NextPlayer string `json:"next_player"`
+	NextPlayer string `json:"next_player,omitempty"`
 	Phase      string `json:"phase"`
 }
 

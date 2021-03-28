@@ -31,11 +31,12 @@ func CreateGame(p1 string, p2 string) (*models.Game, constants.NewGameResponse, 
 		Ships: createFleet(),
 		Board: createBoard(),
 	}
+
 	players := make(map[string]models.Player)
 	players["p1"] = player1
 	players["p2"] = player2
 	game.Players = players
-	game.PlayerTurn = player1.Name
+	game.PlayerTurn = "p1"
 	game.Phase = "setup"
 
 	util.PrintStats(&game)
@@ -43,7 +44,7 @@ func CreateGame(p1 string, p2 string) (*models.Game, constants.NewGameResponse, 
 	return &game, constants.NewGameResponse{
 		SessionId: game.Id,
 		Phase:     game.Phase,
-		Player:    game.PlayerTurn,
+		Player:    game.Players[game.PlayerTurn].Name,
 	}, nil
 }
 

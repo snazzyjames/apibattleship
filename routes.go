@@ -14,30 +14,57 @@ type Route struct {
 type Routes []Route
 
 var routes = Routes{
+
+	//	New Game
+	//	Method: POST
+	//	Request:
+	//		JSON {"player_one": "<name>", "player_two": "<other name>"}
+	//	Response:
+	//		JSON {"session_id: "<unique session id>", "phase":"setup", "player":"<player_one_name>"}
 	Route{
 		"NewGame",
 		"POST",
 		"/games/new",
 		NewGame,
 	},
+	//	Setup Game
+	//	Method: POST
+	//	Path param: sessionId (the ID of the game to setup)
+	//	Request:
+	//		JSON {"ship": "carrier|battleship|cruiser|submarine|destroyer", "coordinate": "<A0-G9>",
+	//		direction:"down|right", player: "<player_name>"}
+	//	Response:
+	//		if still in setup: JSON {"placed: "true|false", "next_player": "<next_player>", "phase":"setup"}
+	//		if ready for play: JSON {"placed: "true|false", "phase":"play"}
 	Route{
-		"SetupSession",
+		"SetupGame",
 		"POST",
 		"/games/{sessionId}/setup",
-		SetupSession,
+		SetupGame,
 	},
+	//	Play Game
+	//	Method: POST
+	//	Path Param: sessionId (the ID of the game to play)
+	//	Request:
+	//		JSON {"coordinate":"<A0-G9>", "player": "<player_name"}
+	//	Response:
+	//		JSON {"result":"hit|miss|hit_sunk|hit_good_game|not_your_turn|game_over",
+	//		"next_player": "<next_player>"}
 	Route{
-		"PlaySession",
+		"PlayGame",
 		"POST",
 		"/games/{sessionId}/play",
-		PlaySession,
+		PlayGame,
 	},
+	// Get Game
+	// Method: GET
+	// Path Param: sessionId (the ID of the game to get)
+	// Response:
+	// 		JSON {"phase": "setup|play|game_over", "players":["<player_one>","<player_two>"]
 	Route{
-		"GetSession",
+		"GetGame",
 		"GET",
 		"/games/{sessionId}",
-		GetSession,
+		GetGame,
 	},
-
-	//TODO: Get Game endpoint
 }

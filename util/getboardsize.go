@@ -11,17 +11,17 @@ func GetBoardSize() (int, int) {
 	var y = os.Getenv("BOARD_SIZE_Y")
 
 	if x == "" || y == "" {
-		log.Panicf("No environment variables set for BOARD_SIZE_X or BOARD_SIZE_Y, please check .env")
+		log.Fatalf("No environment variables set for BOARD_SIZE_X or BOARD_SIZE_Y, please check .env")
 	}
 
 	boardSizeX, err := strconv.Atoi(x)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	boardSizeY, err := strconv.Atoi(y)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	return boardSizeX, boardSizeY

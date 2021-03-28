@@ -12,52 +12,46 @@ import (
 )
 
 func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants.SetupGameResponse, error) {
-	if game.PlayerTurn != request.Player {
-		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
-		return constants.SetupGameResponse{
-			Placed:     "false",
-			NextPlayer: game.PlayerTurn,
-			Phase:      game.Phase,
-		}, errors.New("incorrect player turn")
-	}
-
 	if game.Phase != "setup" {
 		log.Printf("cannot setup game, game phase is %v", game.Phase)
 		return constants.SetupGameResponse{
 			Placed:     "false",
-			NextPlayer: game.PlayerTurn,
+			NextPlayer: game.Players[game.PlayerTurn].Name,
 			Phase:      game.Phase,
 		}, fmt.Errorf("cannot setup game, game phase is %v", game.Phase)
 	}
 
-	players := game.Players
-
-	var board models.Board
-	var ships map[string]*models.Ship
-	if (players)["p1"].Name == request.Player {
-		board = (players)["p1"].Board
-		ships = (players)["p1"].Ships
-	} else {
-		board = (players)["p2"].Board
-		ships = (players)["p2"].Ships
+	if game.Players[game.PlayerTurn].Name != request.Player {
+		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.Players[game.PlayerTurn].Name)
+		return constants.SetupGameResponse{
+			Placed:     "false",
+			NextPlayer: game.Players[game.PlayerTurn].Name,
+			Phase:      game.Phase,
+		}, errors.New("incorrect player turn")
 	}
+
+	players := game.Players
+	board := (players)[game.PlayerTurn].Board
+	ships := (players)[game.PlayerTurn].Ships
 
 	x, y, err := util.ParsePosition(request.Coordinate)
 	if err != nil {
 		log.Println(err)
 		return constants.SetupGameResponse{
 			Placed:     "false",
-			NextPlayer: game.PlayerTurn,
+			NextPlayer: game.Players[game.PlayerTurn].Name,
 			Phase:      game.Phase,
 		}, errors.New("failed parsing position")
 	}
 
-	var ship *models.Ship
-	for key, playerShip := range ships {
-		if key == request.Ship {
-			ship = playerShip
-			break
-		}
+	ship := ships[request.Ship]
+	if ship == nil {
+		log.Println("invalid ship")
+		return constants.SetupGameResponse{
+			Placed:     "false",
+			NextPlayer: game.Players[game.PlayerTurn].Name,
+			Phase:      game.Phase,
+		}, errors.New("invalid ship")
 	}
 
 	placed, err := placeShip(&board, x, y, ship, request.Direction)
@@ -65,41 +59,45 @@ func SetupGame(game *models.Game, request constants.SetupGameRequest) (constants
 		log.Println(err)
 		return constants.SetupGameResponse{
 			Placed:     "false",
-			NextPlayer: game.PlayerTurn,
+			NextPlayer: game.Players[game.PlayerTurn].Name,
 			Phase:      game.Phase,
 		}, err
 	}
 
 	if placed {
-		if game.PlayerTurn == game.Players["p1"].Name {
-			game.PlayerTurn = game.Players["p2"].Name
+		if game.PlayerTurn == "p1" {
+			game.PlayerTurn = "p2"
 		} else {
-			game.PlayerTurn = game.Players["p1"].Name
+			game.PlayerTurn = "p1"
 		}
-	}
-
-	allPlaced := checkIfAllShipsPlaced(players["p1"].Ships, players["p2"].Ships)
-	if allPlaced {
-		game.Phase = "play"
 	}
 
 	util.PrintStats(game)
 
+	allPlaced := checkIfAllShipsPlaced(players["p1"].Ships, players["p2"].Ships)
+	if allPlaced {
+		game.Phase = "play"
+		return constants.SetupGameResponse{
+			Placed: strconv.FormatBool(placed),
+			Phase:  game.Phase,
+		}, nil
+	}
+
 	return constants.SetupGameResponse{
 		Placed:     strconv.FormatBool(placed),
-		NextPlayer: game.PlayerTurn,
+		NextPlayer: game.Players[game.PlayerTurn].Name,
 		Phase:      game.Phase,
 	}, nil
 }
 
-func checkIfAllShipsPlaced(ships1 models.Ships, ships2 models.Ships) bool {
+func checkIfAllShipsPlaced(p1ships models.Ships, p2ships models.Ships) bool {
 	var allPlaced = true
-	for _, ship := range ships1 {
+	for _, ship := range p1ships {
 		if ship.Placed == false {
 			allPlaced = false
 		}
 	}
-	for _, ship := range ships2 {
+	for _, ship := range p2ships {
 		if ship.Placed == false {
 			allPlaced = false
 		}
@@ -123,7 +121,7 @@ func placeShip(board *models.Board, x int, y int, ship *models.Ship, direction s
 		my = 1
 	}
 
-	ix, iy := x, y // create copies of x and y to use for investigation of board
+	ix, iy := x, y // create copies of x and y for investigating board
 	for i := 0; i < ship.Length; i++ {
 		if !util.IsValidCoord(ix, iy) {
 			return false, errors.New("error: ship is off the board")
@@ -135,7 +133,7 @@ func placeShip(board *models.Board, x int, y int, ship *models.Ship, direction s
 		iy += my
 	}
 
-	// Everything is good to go, place the ship on the board.
+	// Place ship on board after checking it won't be placed out of bounds or on top of another ship
 	for i := 0; i < ship.Length; i++ {
 		(*board)[x][y] = ship.Mask
 		x += mx
