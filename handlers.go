@@ -31,7 +31,7 @@ func NewGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, message, http.StatusBadRequest)
 		return
 	}
-	// TODO: validate and sanitize input params using Golang best practices
+
 	newGame, response, err := services.CreateGame(request.PlayerOne, request.PlayerTwo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -54,7 +54,7 @@ func SetupGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unrecognized json", http.StatusBadRequest)
 		return
 	}
-	// TODO: validate and sanitize input params using Golang best practices
+
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
@@ -82,7 +82,7 @@ func PlayGame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "unrecognized json", http.StatusBadRequest)
 		return
 	}
-	// TODO: validate and sanitize input params using Golang best practices
+
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 	game := getGameById(gameId)
@@ -101,7 +101,6 @@ func PlayGame(w http.ResponseWriter, r *http.Request) {
 func GetGame(w http.ResponseWriter, r *http.Request) {
 	w = setContentType(w)
 
-	// TODO: future improvement: validate and sanitize input params using Golang best practices
 	vars := mux.Vars(r)
 	gameId := vars["sessionId"]
 
