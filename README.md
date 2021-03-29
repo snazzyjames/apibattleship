@@ -11,7 +11,7 @@ Golang is needed to build the executable: https://golang.org/doc/install
 Run `go build` from the project directory, which will generate an executable called `apibattleship`, which you can then run:
 
 ```bash
-./apibattleship
+$> ./apibattleship
 ```
 
 The application was designed to be run in a command line interface.
