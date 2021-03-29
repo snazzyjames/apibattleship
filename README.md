@@ -1,6 +1,8 @@
+![Gopher Pirate](https://img.devrant.com/devrant/rant/r_557673_5ZQ9F.jpg)
+
 # API Battleship
 
-API Battleship is a REST API for playing the strategy guessing game Battleship.
+API Battleship is a REST API written in Golang for playing the strategy guessing game Battleship.
 
 ## Prerequisites
 
