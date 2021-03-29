@@ -6,7 +6,7 @@ type NewGameResponse struct {
 	Player    string `json:"player"`
 }
 
-type GetSessionResponse struct {
+type GetGameResponse struct {
 	Phase   string    `json:"phase"`
 	Players [2]string `json:"players"`
 }

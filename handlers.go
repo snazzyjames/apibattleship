@@ -116,7 +116,7 @@ func GetGame(w http.ResponseWriter, r *http.Request) {
 		game.Players["p2"].Name,
 	}
 
-	json.NewEncoder(w).Encode(responses.GetSessionResponse{
+	json.NewEncoder(w).Encode(responses.GetGameResponse{
 		Phase:   game.Phase,
 		Players: players,
 	})

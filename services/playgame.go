@@ -29,13 +29,21 @@ func PlayGame(game *models.Game, request requests.PlayGameRequest) (responses.Pl
 		log.Printf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
 		return responses.PlayGameResponse{
 			Result:     "not_your_turn",
-			NextPlayer: game.PlayerTurn,
+			NextPlayer: game.Players[game.PlayerTurn].Name,
 		}, fmt.Errorf("error: Not %s's turn. Player turn is %s", request.Player, game.PlayerTurn)
 	}
 
 	players := game.Players
-	board := (players)[game.PlayerTurn].Board
-	ships := (players)[game.PlayerTurn].Ships
+
+	var board models.Board
+	var ships map[string]*models.Ship
+	if (players)["p1"].Name == request.Player {
+		board = (players)["p2"].Board
+		ships = (players)["p2"].Ships
+	} else {
+		board = (players)["p1"].Board
+		ships = (players)["p1"].Ships
+	}
 
 	x, y, err := util.ParsePosition(request.Coordinate)
 	if err != nil {
