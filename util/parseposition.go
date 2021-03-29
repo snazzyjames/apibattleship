@@ -13,7 +13,7 @@ func ParsePosition(location string) (x int, y int, err error) {
 	}
 
 	location = strings.TrimSpace(strings.ToLower(location))
-	y = int(location[0] - 'a')          // first char of string in asii minus the ascii code for 'a'
+	y = int(location[0] - 'a')          // first char of string in ascii minus the ascii code for 'a'
 	x, err = strconv.Atoi(location[1:]) // string to int conversion for remaining string bytes.
 	if err != nil {
 		return 0, 0, fmt.Errorf("invalid location %v", location)
